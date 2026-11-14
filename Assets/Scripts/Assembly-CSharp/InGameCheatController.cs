@@ -96,29 +96,33 @@ public class InGameCheatController : MonoBehaviour
             rt.anchoredPosition = new Vector2(credRt.anchoredPosition.x, credRt.anchoredPosition.y - 64f);
         }
 
-        // Đổi ảnh hiển thị hoặc gắn chữ CHEAT
+        // Đổi màu nền nút CHEAT nổi bật và xóa sprite cũ
         Image img = cheatBtn.GetComponent<Image>();
         if (img != null)
         {
-            img.color = new Color(0.2f, 0.8f, 0.2f, 0.85f); // Màu xanh lá nổi bật
+            img.sprite = null;
+            img.color = new Color(0.15f, 0.75f, 0.25f, 0.95f);
         }
 
-        // Tạo Text hiển thị chữ "CHEAT"
-        GameObject textObj = new GameObject("Text");
-        textObj.transform.SetParent(cheatBtn.transform, false);
-        RectTransform textRt = textObj.AddComponent<RectTransform>();
-        textRt.anchorMin = Vector2.zero;
-        textRt.anchorMax = Vector2.one;
-        textRt.sizeDelta = Vector2.zero;
-        textRt.anchoredPosition = Vector2.zero;
-
-        Text txt = textObj.AddComponent<Text>();
+        // Tạo hoặc cập nhật Text hiển thị chữ "CHEAT"
+        Text txt = cheatBtn.GetComponentInChildren<Text>();
+        if (txt == null)
+        {
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(cheatBtn.transform, false);
+            RectTransform textRt = textObj.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.sizeDelta = Vector2.zero;
+            textRt.anchoredPosition = Vector2.zero;
+            txt = textObj.AddComponent<Text>();
+        }
         txt.text = "CHEAT";
         txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        txt.fontSize = 42;
+        txt.fontSize = 36;
         txt.fontStyle = FontStyle.Bold;
         txt.alignment = TextAnchor.MiddleCenter;
-        txt.color = Color.black;
+        txt.color = Color.white;
 
         // Gắn sự kiện click mở menu cheat
         Button btn = cheatBtn.GetComponent<Button>();
@@ -135,9 +139,49 @@ public class InGameCheatController : MonoBehaviour
     private void Update()
     {
         // Nhấn phím 'C' hoặc 'Tab' trên PC để bật/tắt Cheat Menu
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.Tab))
         {
             showGui = !showGui;
+        }
+
+        // Đảm bảo nút CHEAT luôn hiện diện bên dưới CREDITS ở Menu
+        string currentScene = SceneManager.GetActiveScene().name;
+        if (currentScene == "MainMenu")
+        {
+            GameObject creditsBtn = GameObject.Find("CreditsButton");
+            if (creditsBtn != null && creditsBtn.transform.parent != null)
+            {
+                if (creditsBtn.transform.parent.Find("CheatButton") == null)
+                {
+                    CreateMenuCheatButton();
+                }
+            }
+        }
+
+        // Xử lý tự động ẩn/hiện chuột thông minh trên PC:
+        if (showGui || Time.timeScale == 0f)
+        {
+            // Khi mở menu Cheat hoặc khi tạm dừng (Pause): Hiện con trỏ chuột
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else if (currentScene == "School" || currentScene == "Secret" || currentScene == "TestRoom")
+        {
+            // Khi vào trong trận đấu: Tự động khóa và ẩn con trỏ chuột trên PC
+            if (!Application.isMobilePlatform && Cursor.lockState != CursorLockMode.Locked)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+        else
+        {
+            // Khi ở ngoài menu chính hoặc thoát trận: Luôn mở khóa con trỏ chuột
+            if (Cursor.lockState != CursorLockMode.None)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
 
         // Ẩn nút cảm ứng Mobile nếu đang chơi trên PC
