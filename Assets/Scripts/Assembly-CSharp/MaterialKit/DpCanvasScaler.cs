@@ -90,7 +90,7 @@ namespace MaterialKit
 
 		protected override void OnEnable()
 		{
-			OnEnable();
+			base.OnEnable();
 			m_Canvas = GetComponent<Canvas>();
 			Handle();
 		}
@@ -99,7 +99,7 @@ namespace MaterialKit
 		{
 			SetScaleFactor(1f);
 			SetReferencePixelsPerUnit(100f);
-			OnDisable();
+			base.OnDisable();
 		}
 
 		protected virtual void Update()
@@ -130,6 +130,15 @@ namespace MaterialKit
 
 		protected virtual void HandleConstantPhysicalSize()
 		{
+			if (Application.platform == RuntimePlatform.WebGLPlayer || !Application.isMobilePlatform)
+			{
+				float targetHeight = 720f;
+				float scale = (float)Screen.height / targetHeight;
+				if (scale < 0.2f) scale = 1f;
+				SetScaleFactor(scale);
+				SetReferencePixelsPerUnit(100f);
+				return;
+			}
 			float dpi = CFScreen.dpi;
 			float num = ((dpi != 0f) ? dpi : m_FallbackScreenDPI);
 			float num2 = 160f;

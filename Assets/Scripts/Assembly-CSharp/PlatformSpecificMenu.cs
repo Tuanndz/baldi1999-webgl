@@ -8,6 +8,14 @@ public class PlatformSpecificMenu : MonoBehaviour
 
 	private void Start()
 	{
-		pC.SetActive(true);
+		bool isMobile = Application.isMobilePlatform;
+		if (pC != null)
+		{
+			pC.SetActive(!isMobile);
+		}
+		if (mobile != null)
+		{
+			mobile.SetActive(isMobile);
+		}
 	}
 }

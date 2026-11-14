@@ -7,5 +7,7 @@ public class UnlockCursor : MonoBehaviour
 	{
 		CFCursor.lockState = CursorLockMode.None;
 		CFCursor.visible = true;
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.visible = true;
 	}
 }

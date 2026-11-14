@@ -7,11 +7,23 @@ public class CursorControllerScript : MonoBehaviour
 	{
 		CFCursor.lockState = CursorLockMode.Locked;
 		CFCursor.visible = false;
+		Cursor.lockState = CursorLockMode.Locked;
+		Cursor.visible = false;
 	}
 
 	public void UnlockCursor()
 	{
 		CFCursor.lockState = CursorLockMode.None;
 		CFCursor.visible = true;
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.visible = true;
+	}
+
+	private void Update()
+	{
+		if (Input.GetMouseButtonDown(0) && Cursor.lockState != CursorLockMode.Locked)
+		{
+			LockCursor();
+		}
 	}
 }
